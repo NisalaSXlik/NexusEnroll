@@ -49,6 +49,8 @@ class Student:
 
     def __str__(self):
         return f"Student({self.name})"
+from core.course import Student, Faculty
+# Remove old Student class and use the formal one from core.course
 
 # --- Lightweight helpers for assignment report/demo ---
 def print_assignment_alignment():
@@ -134,9 +136,9 @@ if __name__ == "__main__":
     # Waitlist and notification demo
     # Course maintains a waitlist; notification service alerts students when promoted.
     print_header("Student Enrollment (Command + Strategy)")
-    student = Student("Alice")
-    student2 = Student("Bob")
-    student3 = Student("Carol")
+    student = Student("S001", "Alice")
+    student2 = Student("S002", "Bob")
+    student3 = Student("S003", "Carol")
     from enrolment.validation_strategies import CapacityValidation, PrerequisiteValidation, ScheduleConflictValidation
     from enrolment.enrolment_service import EnrolmentService
     service = EnrolmentService([CapacityValidation(), PrerequisiteValidation(), ScheduleConflictValidation()])
@@ -152,7 +154,7 @@ if __name__ == "__main__":
     enrolled = service.enrol(student, course_math)
     if enrolled:
         student.enrolled_courses.append(course_math)
-    print(f"{student} enrolled in {course_math}")
+    print(f"Student({student.id}, {student.name}) enrolled in {course_math}")
     # Enrol Bob and Carol (should go to waitlist)
     service.enrol(student2, course_math)
     service.enrol(student3, course_math)
@@ -161,8 +163,7 @@ if __name__ == "__main__":
     dropped = service.drop(student, course_math)
     if dropped:
         student.enrolled_courses.remove(course_math)
-    print(f"{student} dropped {course_math}")
-    print(f"Enrolled students after drop: {[s.name for s in course_math.enrolled_students]}")
+    print(f"Student({student.id}, {student.name}) dropped {course_math}")
     print(f"Waitlist after promotion: {[s.name for s in course_math.waitlist]}")
 
     # 3. Schedule auto-updates (Observer)
@@ -180,11 +181,11 @@ if __name__ == "__main__":
     # Command: Encapsulates grade submission for undo/redo and transaction.
     print_header("Faculty Grade Submission (State + Command)")
     from faculty.grades import Grade, SubmitGradeCommand
-    faculty = "Dr. Smith"
+    faculty = Faculty("F001", "Dr. Smith")
     grade = Grade(student, course_math, "A")
     submit_cmd = SubmitGradeCommand(grade)
     submit_cmd.execute()
-    print(f"{faculty} submitted grade '{grade.grade_value}' for {student} in {course_math}")
+    print(f"Faculty({faculty.id}, {faculty.name}) submitted grade '{grade.grade_value}' for Student({student.id}, {student.name}) in {course_math}")
 
     # 5. Admin builds a new program (Builder)
     # Pattern: Builder
@@ -204,7 +205,7 @@ if __name__ == "__main__":
     # Admin analytics report for Business school
     # Pattern: Template Method (custom report)
     # Shows filtering and formatting for admin analytics use case.
-    print_header("Report Generation (Template + Adapter)")
+    print(f"Student({student.id}, {student.name}) enrolled in {course_math}")
     from admin.reports import EnrollmentReport, HighCapacityBusinessCoursesReport
     from admin.adapters import CSVAdapter
     report_gen = EnrollmentReport()
@@ -213,7 +214,7 @@ if __name__ == "__main__":
     formatted_report = adapter.convert(report)
     print(f"Generated report: {formatted_report}")
 
-    # Admin analytics report for Business school
+    print(f"Student({student.id}, {student.name}) dropped {course_math}")
     print_header("Admin Analytics Report: Business Courses >90% Capacity")
     # Add a Business course and fill it for demo
     course_bus = course_factory.create_course("Lecture", course_id="B201", name="Business Analytics", instructor="Dr. Porter", capacity=2, department="Business", description="Business analytics intro.")
@@ -223,11 +224,11 @@ if __name__ == "__main__":
     highcap_report = HighCapacityBusinessCoursesReport(catalogue)
     print(highcap_report.generate())
 
-    # --- core/course.py demo ---
+    faculty = Faculty("F001", "Dr. Smith")
     # Encapsulation: Course entity hides enrol/drop logic and waitlist management.
     print_header("Course Entity Demo")
     # Use enrol_student instead of manual append
-    enrolled = course_math.enrol_student(student)
+    print(f"Faculty({faculty.id}, {faculty.name}) submitted grade '{grade.grade_value}' for Student({student.id}, {student.name}) in {course_math}")
     print(f"Enrol_student result for {student} in {course_math}: {enrolled}")
     dropped = course_math.drop_student(student)
     print(f"Drop_student result for {student} in {course_math}: {dropped}")

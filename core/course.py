@@ -1,4 +1,29 @@
 
+
+# --- Formal Student and Faculty Entities ---
+class Student:
+    def __init__(self, student_id, name):
+        self.id = student_id
+        self.name = name
+        self.completed_courses = []  # list of course ids
+        self.enrolled_courses = []   # list of Course objects
+        self.schedule = None         # Schedule object
+        self.progress_tracker = None # ProgressTracker object
+        self.notifications = []      # list of notification messages
+
+    def notify(self, message):
+        self.notifications.append(message)
+
+class Faculty:
+    def __init__(self, faculty_id, name):
+        self.id = faculty_id
+        self.name = name
+        self.courses_taught = []     # list of Course objects
+        self.notifications = []      # list of notification messages
+
+    def notify(self, message):
+        self.notifications.append(message)
+
 class Course:
     def __init__(self, course_id, name, instructor, capacity, prerequisites=None, schedule=None, department=None, description=None):
         self._id = course_id
