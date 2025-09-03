@@ -18,6 +18,9 @@ class ScheduleConflictValidation(ValidationStrategy):
     def validate(self, student, course):
         # Assume student.enrolled_courses is a list of Course objects
         for enrolled in getattr(student, "enrolled_courses", []):
+            # Ignore unknown schedules
+            if enrolled.schedule is None or course.schedule is None:
+                continue
             if enrolled.schedule == course.schedule:
                 return False
         return True

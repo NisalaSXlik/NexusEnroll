@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class ReportGenerator(ABC):
     def generate(self):
         data = self.fetch_data()
@@ -17,6 +18,24 @@ class ReportGenerator(ABC):
     @abstractmethod
     def format_data(self, data):
         pass
+
+class HighCapacityBusinessCoursesReport(ReportGenerator):
+    def __init__(self, catalogue):
+        self.catalogue = catalogue
+
+    def fetch_data(self):
+        # Get all courses in Business school
+        return [c for c in self.catalogue.list_courses() if getattr(c, 'department', None) == 'Business']
+
+    def process_data(self, data):
+        # Filter courses >90% capacity
+        return [c for c in data if c.capacity > 0 and len(c.enrolled_students) / c.capacity >= 0.9]
+
+    def format_data(self, data):
+        if not data:
+            return "No Business courses over 90% capacity."
+        lines = [f"{c.name} ({c.id}): {len(c.enrolled_students)}/{c.capacity} enrolled" for c in data]
+        return "High Capacity Business Courses:\n" + "\n".join(lines)
 
 class EnrollmentReport(ReportGenerator):
     def fetch_data(self):

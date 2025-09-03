@@ -48,4 +48,9 @@ class LoggingDecorator(RequestHandler):
 
     def handle(self, request):
         print(f"[LOG] Handling request: {request.type} - {request.description}")
-        return self._handler.handle(request)
+        # First, delegate to the wrapped handler
+        handled = self._handler.handle(request)
+        # If not handled, propagate to the next in the chain (CoR)
+        if not handled and self._next:
+            return self._next.handle(request)
+        return handled
