@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Readme</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 0;
+            padding-left: 20px;
+            color: #666;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        @media print {
+            body { margin: 0; }
+            .header { page-break-after: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Readme</h1>
+        <p>NexusEnroll - University Course Enrolment System</p>
+        <p>Generated on: 2025-09-03 08:31:08</p>
+    </div>
+    <h1 id="nexusenroll-university-course-enrollment-system">NexusEnroll - University Course Enrollment System</h1>
+<h2 id="software-architecture-assignment-scs-2303">Software Architecture Assignment (SCS 2303)</h2>
+<h3 id="project-overview">Project Overview</h3>
+<p>This project implements a modern university course enrollment system called "NexusEnroll" to replace the legacy "LegacyEnroll" system. The solution demonstrates the application of software design principles, design patterns, and architectural patterns.</p>
+<h3 id="architecture-choice-3-tier-architecture">Architecture Choice: 3-Tier Architecture</h3>
+<p><strong>Justification:</strong>
+- <strong>Scalability</strong>: Each tier can be scaled independently based on demand
+- <strong>Maintainability</strong>: Clear separation of concerns makes the system easier to maintain
+- <strong>Flexibility</strong>: Easy to modify individual tiers without affecting others
+- <strong>Integration</strong>: Well-suited for future integration with external systems (financial aid, etc.)
+- <strong>Performance</strong>: Optimized for handling high-volume concurrent users during enrollment periods</p>
+<h3 id="design-patterns-implemented">Design Patterns Implemented</h3>
+<ol>
+<li><strong>Observer Pattern</strong>: For notification system (email notifications, waitlist updates)</li>
+<li><strong>Factory Method Pattern</strong>: For creating different types of users and courses</li>
+<li><strong>Strategy Pattern</strong>: For different enrollment validation strategies</li>
+<li><strong>Command Pattern</strong>: For enrollment operations (add/drop courses)</li>
+<li><strong>Singleton Pattern</strong>: For system configuration and logging</li>
+</ol>
+<h3 id="project-structure">Project Structure</h3>
+<pre><code>nexus_enroll/
+├── models/           # Business entities and data models
+├── services/         # Business logic layer
+├── patterns/         # Design pattern implementations
+├── validators/       # Validation strategies
+├── notifications/    # Observer pattern implementation
+├── commands/         # Command pattern implementation
+├── tests/           # Test cases and demonstrations
+└── main.py          # Main application entry point
+</code></pre>
+<h3 id="running-the-application">Running the Application</h3>
+<pre><code class="language-bash">python main.py
+</code></pre>
+<h3 id="key-features">Key Features</h3>
+<ul>
+<li>Student self-service enrollment</li>
+<li>Faculty grade management</li>
+<li>Administrator system control</li>
+<li>Real-time notifications</li>
+<li>Transaction management</li>
+<li>Comprehensive validation</li>
+</ul>
+</body>
+</html>

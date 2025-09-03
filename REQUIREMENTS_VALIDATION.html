@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Requirements Validation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 0;
+            padding-left: 20px;
+            color: #666;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        @media print {
+            body { margin: 0; }
+            .header { page-break-after: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Requirements Validation</h1>
+        <p>NexusEnroll - University Course Enrolment System</p>
+        <p>Generated on: 2025-09-03 08:31:08</p>
+    </div>
+    <h1 id="assignment-requirements-validation-guide">Assignment Requirements Validation Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This document provides a systematic approach to validate that all requirements of the Software Architecture (SCS 2303) Assignment 3 have been met for the NexusEnroll system.</p>
+<h2 id="part-a-architectural-design-30-of-grade">Part A: Architectural Design (30% of grade)</h2>
+<h3 id="1-architectural-pattern-selection">1. Architectural Pattern Selection ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Choose suitable architectural patterns (Microservices, SOA, or 3-Tier)</li>
+<li><strong>Our Choice</strong>: 3-Tier Architecture</li>
+<li><strong>Validation</strong>: </li>
+<li>✅ Documented in <code>docs/architecture_analysis.md</code></li>
+<li>✅ Justified based on scalability, maintainability, and integration needs</li>
+<li>✅ Appropriate for university enrollment system</li>
+</ul>
+<h3 id="2-architectural-justification">2. Architectural Justification ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Detailed justification for chosen pattern</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ Comprehensive analysis in <code>docs/architecture_analysis.md</code></li>
+<li>✅ Considers scalability, maintainability, and future integration</li>
+<li>✅ Addresses university's specific needs</li>
+</ul>
+<h3 id="3-architecture-diagram-description">3. Architecture Diagram &amp; Description ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Clear diagram with labeled components and communication pathways</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ Text-based architecture diagram in <code>docs/architecture_analysis.md</code></li>
+<li>✅ All layers, tiers, and services labeled</li>
+<li>✅ Communication pathways described</li>
+<li>✅ Component functions and responsibilities explained</li>
+</ul>
+<h2 id="part-b-detailed-design-implementation-70-of-grade">Part B: Detailed Design &amp; Implementation (70% of grade)</h2>
+<h3 id="1-core-features-identification">1. Core Features Identification ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Focus on student, faculty, and administrator modules</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ Student module: Course browsing, enrollment, schedule management</li>
+<li>✅ Faculty module: Class rosters, grade submission, course management</li>
+<li>✅ Administrator module: Course management, user management, reporting</li>
+</ul>
+<h3 id="2-design-pattern-application">2. Design Pattern Application ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Minimum 3 distinct object-oriented design patterns</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ <strong>Observer Pattern</strong>: Notification system for enrollment events</li>
+<li>✅ <strong>Factory Method Pattern</strong>: User and course object creation</li>
+<li>✅ <strong>Strategy Pattern</strong>: Enrollment validation rules</li>
+<li>✅ <strong>Command Pattern</strong>: Encapsulated enrollment operations</li>
+<li>✅ Each pattern documented with usage justification</li>
+</ul>
+<h3 id="3-core-business-logic-design">3. Core Business Logic Design ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Focus on business logic layer with UML diagrams</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ Business logic separated from presentation</li>
+<li>✅ Primary objects identified and relationships defined</li>
+<li>✅ UML diagrams created:<ul>
+<li>✅ Activity Diagram: Enrollment process flow</li>
+<li>✅ Sequence Diagram: Object interactions</li>
+<li>✅ State Diagram: Object lifecycles</li>
+<li>✅ Class Diagram: Class structure and relationships</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-software-design-principles">4. Software Design Principles ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Adherence to SOLID, DRY, KISS, and other principles</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ <strong>SOLID Principles</strong>:<ul>
+<li>✅ Single Responsibility: Each class has one reason to change</li>
+<li>✅ Open/Closed: Open for extension, closed for modification</li>
+<li>✅ Liskov Substitution: Subtypes are substitutable for base types</li>
+<li>✅ Interface Segregation: Clients depend only on needed interfaces</li>
+<li>✅ Dependency Inversion: Depend on abstractions, not concretions</li>
+</ul>
+</li>
+<li>✅ <strong>DRY</strong>: No code duplication</li>
+<li>✅ <strong>KISS</strong>: Simple, understandable design</li>
+<li>✅ <strong>Encapsulation</strong>: Data hiding and controlled access</li>
+<li>✅ <strong>Programming to Interface</strong>: Abstract base classes and interfaces</li>
+<li>✅ <strong>Composition over Inheritance</strong>: Favor composition</li>
+</ul>
+<h3 id="5-implementation">5. Implementation ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Runnable proof-of-concept in Python</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ Complete Python implementation</li>
+<li>✅ All three modules implemented (Student, Faculty, Administrator)</li>
+<li>✅ Design patterns integrated into business logic</li>
+<li>✅ Main function with test scenarios</li>
+<li>✅ Clear comments explaining design patterns</li>
+</ul>
+<h3 id="6-documentation">6. Documentation ✅</h3>
+<ul>
+<li><strong>Requirement</strong>: Comprehensive documentation</li>
+<li><strong>Validation</strong>:</li>
+<li>✅ Architectural diagrams and justifications</li>
+<li>✅ Class diagrams with design pattern highlights</li>
+<li>✅ Design pattern descriptions and implementations</li>
+<li>✅ Well-commented source code</li>
+<li>✅ README with setup instructions</li>
+</ul>
+<h2 id="functional-requirements-validation">Functional Requirements Validation</h2>
+<h3 id="student-module">Student Module ✅</h3>
+<ul>
+<li>✅ Course catalogue browsing</li>
+<li>✅ Registration and enrollment with validation</li>
+<li>✅ Personal schedule management</li>
+<li>✅ Academic progress tracking</li>
+</ul>
+<h3 id="faculty-module">Faculty Module ✅</h3>
+<ul>
+<li>✅ Class roster viewing</li>
+<li>✅ Grade submission with approval process</li>
+<li>✅ Course information management</li>
+</ul>
+<h3 id="administrator-module">Administrator Module ✅</h3>
+<ul>
+<li>✅ Course and program management</li>
+<li>✅ Student and faculty management</li>
+<li>✅ Reporting and analytics</li>
+</ul>
+<h3 id="system-wide-requirements">System-Wide Requirements ✅</h3>
+<ul>
+<li>✅ Notification system (Observer pattern)</li>
+<li>✅ Transaction management</li>
+<li>✅ API-ready architecture for SPA frontend</li>
+</ul>
+<h2 id="testing-strategy">Testing Strategy</h2>
+<h3 id="1-unit-testing">1. Unit Testing</h3>
+<ul>
+<li>Run <code>python -m pytest tests/</code> to execute unit tests</li>
+<li>Verify all business logic functions work correctly</li>
+</ul>
+<h3 id="2-integration-testing">2. Integration Testing</h3>
+<ul>
+<li>Run <code>python main.py</code> to test complete system integration</li>
+<li>Run <code>python demo.py</code> for simplified demonstration</li>
+</ul>
+<h3 id="3-design-pattern-validation">3. Design Pattern Validation</h3>
+<ul>
+<li>Verify Observer pattern triggers notifications</li>
+<li>Verify Factory pattern creates correct objects</li>
+<li>Verify Strategy pattern applies validation rules</li>
+<li>Verify Command pattern encapsulates operations</li>
+</ul>
+<h3 id="4-architecture-validation">4. Architecture Validation</h3>
+<ul>
+<li>Confirm 3-tier separation (Presentation, Business, Data)</li>
+<li>Verify loose coupling between layers</li>
+<li>Confirm scalability and maintainability</li>
+</ul>
+<h2 id="assessment-criteria-checklist">Assessment Criteria Checklist</h2>
+<h3 id="architectural-choice-justification-15">Architectural Choice &amp; Justification (15%) ✅</h3>
+<ul>
+<li>✅ Appropriate pattern selection</li>
+<li>✅ Comprehensive justification</li>
+<li>✅ Consideration of university needs</li>
+</ul>
+<h3 id="architectural-diagram-description-15">Architectural Diagram &amp; Description (15%) ✅</h3>
+<ul>
+<li>✅ Clear, labeled diagram</li>
+<li>✅ Component descriptions</li>
+<li>✅ Communication pathways</li>
+</ul>
+<h3 id="design-pattern-application-40">Design Pattern Application (40%) ✅</h3>
+<ul>
+<li>✅ Minimum 3 patterns implemented</li>
+<li>✅ Patterns properly integrated</li>
+<li>✅ Clear documentation of usage</li>
+</ul>
+<h3 id="implementation-code-quality-20">Implementation &amp; Code Quality (20%) ✅</h3>
+<ul>
+<li>✅ Runnable Python application</li>
+<li>✅ Clean, well-commented code</li>
+<li>✅ Proper error handling</li>
+<li>✅ SOLID principles adherence</li>
+</ul>
+<h3 id="documentation-10">Documentation (10%) ✅</h3>
+<ul>
+<li>✅ Comprehensive documentation</li>
+<li>✅ UML diagrams</li>
+<li>✅ Design pattern explanations</li>
+<li>✅ Setup instructions</li>
+</ul>
+<h2 id="validation-commands">Validation Commands</h2>
+<pre><code class="language-bash"># Run unit tests
+python -m pytest tests/ -v
+
+# Run main demonstration
+python main.py
+
+# Run simplified demo
+python demo.py
+
+# Check code quality
+python -m flake8 . --max-line-length=100
+
+# Verify all files exist
+ls -la docs/
+ls -la models/
+ls -la patterns/
+ls -la services/
+ls -la tests/
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>All assignment requirements have been systematically implemented and validated. The NexusEnroll system demonstrates proper application of software architecture principles, design patterns, and implementation best practices.</p>
+</body>
+</html>

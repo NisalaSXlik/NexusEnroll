@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Uml Diagrams</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 0;
+            padding-left: 20px;
+            color: #666;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        @media print {
+            body { margin: 0; }
+            .header { page-break-after: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Uml Diagrams</h1>
+        <p>NexusEnroll - University Course Enrolment System</p>
+        <p>Generated on: 2025-09-03 08:31:08</p>
+    </div>
+    <h1 id="uml-diagrams-for-nexusenroll-system">UML Diagrams for NexusEnroll System</h1>
+<h2 id="1-class-diagram">1. Class Diagram</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                USER CLASSES                                    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                    User                                        │
+│  - user_id: String                                                             │
+│  - name: String                                                                │
+│  - email: String                                                               │
+│  - user_type: UserType                                                         │
+│  - created_at: DateTime                                                        │
+│  - is_active: Boolean                                                          │
+│  + get_permissions(): List&lt;String&gt;                                             │
+│  + deactivate(): void                                                          │
+│  + activate(): void                                                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+                                        ▲
+                                        │
+                    ┌───────────────────┼───────────────────┐
+                    │                   │                   │
+┌───────────────────▼──────┐  ┌────────▼────────┐  ┌──────▼──────────┐
+│        Student           │  │     Faculty     │  │ Administrator   │
+│  - major: String         │  │ - department:   │  │ - department:   │
+│  - advisor_id: String    │  │   String        │  │   String        │
+│  - enrolled_courses:     │  │ - teaching_     │  │ - admin_level:  │
+│    List&lt;String&gt;          │  │   courses:      │  │   String        │
+│  - completed_courses:    │  │   List&lt;String&gt;  │  │                 │
+│    List&lt;Dict&gt;            │  │                 │  │                 │
+│  - gpa: Float            │  │                 │  │                 │
+│  + enroll_in_course()    │  │ + assign_course()│  │ + set_admin_    │
+│  + drop_course()         │  │ + remove_course()│  │   level()       │
+│  + complete_course()     │  │                 │  │                 │
+└──────────────────────────┘  └─────────────────┘  └─────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                               COURSE CLASSES                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                   Course                                       │
+│  - course_id: String                                                           │
+│  - name: String                                                                │
+│  - description: String                                                         │
+│  - department: String                                                          │
+│  - credits: Integer                                                            │
+│  - instructor_id: String                                                       │
+│  - capacity: Integer                                                           │
+│  - schedule: Schedule                                                          │
+│  - prerequisites: List&lt;Prerequisite&gt;                                           │
+│  - enrolled_students: List&lt;String&gt;                                             │
+│  - waitlist: List&lt;String&gt;                                                      │
+│  - status: CourseStatus                                                        │
+│  + enroll_student(): Boolean                                                   │
+│  + drop_student(): Boolean                                                     │
+│  + add_prerequisite(): void                                                    │
+│  + get_enrollment_info(): Dict                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+                                        │
+                                        │
+                    ┌───────────────────┼───────────────────┐
+                    │                   │                   │
+┌───────────────────▼──────┐  ┌────────▼────────┐  ┌──────▼──────────┐
+│      Schedule            │  │  Prerequisite   │  │  DegreeProgram  │
+│  - days: List&lt;DayOfWeek&gt; │  │ - course_id:    │  │ - program_id:   │
+│  - start_time: Time      │  │   String        │  │   String        │
+│  - end_time: Time        │  │ - min_grade:    │  │ - name: String  │
+│  - location: String      │  │   String        │  │ - department:   │
+│  + conflicts_with():     │  │                 │  │   String        │
+│    Boolean               │  │                 │  │ - total_credits:│
+└──────────────────────────┘  └─────────────────┘  │   Integer       │
+                                                    │ - required_     │
+                                                    │   courses:      │
+                                                    │   List&lt;String&gt;  │
+                                                    └─────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              SERVICE CLASSES                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                            EnrollmentService                                   │
+│  - students: Dict&lt;String, Student&gt;                                             │
+│  - courses: Dict&lt;String, Course&gt;                                               │
+│  - enrollments: Dict&lt;String, List&lt;String&gt;&gt;                                     │
+│  - validation_context: ValidationContext                                       │
+│  - command_invoker: CommandInvoker                                             │
+│  + register_student(): void                                                    │
+│  + register_course(): void                                                     │
+│  + enroll_student(): Boolean                                                   │
+│  + drop_student(): Boolean                                                     │
+│  + get_student_schedule(): List&lt;Dict&gt;                                          │
+│  + get_course_roster(): List&lt;Dict&gt;                                             │
+│  + get_enrollment_statistics(): Dict                                           │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              GradeService                                      │
+│  - grades: Dict&lt;String, Dict&lt;String, String&gt;&gt;                                  │
+│  - grade_history: Dict&lt;String, List&lt;Dict&gt;&gt;                                     │
+│  - pending_grades: Dict&lt;String, List&lt;Dict&gt;&gt;                                    │
+│  - command_invoker: CommandInvoker                                             │
+│  + submit_grades(): Boolean                                                    │
+│  + get_student_grade(): String                                                 │
+│  + calculate_student_gpa(): Float                                              │
+│  + get_grade_statistics(): Dict                                                │
+│  + approve_grades(): Boolean                                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              UserService                                       │
+│  - users: Dict&lt;String, User&gt;                                                   │
+│  - user_sessions: Dict&lt;String, Dict&gt;                                           │
+│  - login_attempts: Dict&lt;String, List&lt;DateTime&gt;&gt;                                │
+│  + create_user(): Tuple&lt;Boolean, User, String&gt;                                 │
+│  + authenticate_user(): Tuple&lt;Boolean, User, String&gt;                           │
+│  + get_user_by_id(): User                                                      │
+│  + update_user_profile(): Tuple&lt;Boolean, String&gt;                               │
+│  + get_user_statistics(): Dict                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h2 id="2-sequence-diagram-student-enrollment-process">2. Sequence Diagram - Student Enrollment Process</h2>
+<pre><code>Student    WebUI    EnrollmentService    ValidationContext    Course    Observer
+   │         │            │                    │               │          │
+   │         │            │                    │               │          │
+   │   1. Request         │                    │               │          │
+   │   enrollment         │                    │               │          │
+   │◄─────────────────────┤                    │               │          │
+   │         │            │                    │               │          │
+   │         │ 2. Enroll  │                    │               │          │
+   │         │ Student    │                    │               │          │
+   │         ├────────────►                    │               │          │
+   │         │            │                    │               │          │
+   │         │            │ 3. Validate        │               │          │
+   │         │            ├────────────────────►               │          │
+   │         │            │                    │               │          │
+   │         │            │ 4. Validation      │               │          │
+   │         │            │    Results         │               │          │
+   │         │            ◄────────────────────┤               │          │
+   │         │            │                    │               │          │
+   │         │            │ 5. Enroll Student  │               │          │
+   │         │            ├────────────────────────────────────►          │
+   │         │            │                    │               │          │
+   │         │            │ 6. Enrollment      │               │          │
+   │         │            │    Result          │               │          │
+   │         │            ◄────────────────────────────────────┤          │
+   │         │            │                    │               │          │
+   │         │            │ 7. Notify          │               │          │
+   │         │            ├─────────────────────────────────────────────────►
+   │         │            │                    │               │          │
+   │         │ 8. Success │                    │               │          │
+   │         │ Response   │                    │               │          │
+   │         ◄────────────┤                    │               │          │
+   │         │            │                    │               │          │
+   │ 9. Display           │                    │               │          │
+   │    Result            │                    │               │          │
+   │◄─────────────────────┤                    │               │          │
+</code></pre>
+<h2 id="3-activity-diagram-course-enrollment-flow">3. Activity Diagram - Course Enrollment Flow</h2>
+<pre><code>                    ┌─────────────────┐
+                    │   Start         │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Student Login   │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Browse Courses  │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Select Course   │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Check           │
+                    │ Prerequisites   │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Prerequisites   │
+                    │ Satisfied?      │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Check Course    │
+                    │ Capacity        │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Course Full?    │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Check Schedule  │
+                    │ Conflicts       │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Schedule        │
+                    │ Conflict?       │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Enroll Student  │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ Send            │
+                    │ Notification    │
+                    └─────────┬───────┘
+                              │
+                    ┌─────────▼───────┐
+                    │ End             │
+                    └─────────────────┘
+</code></pre>
+<h2 id="4-state-diagram-course-enrollment-states">4. State Diagram - Course Enrollment States</h2>
+<pre><code>                    ┌─────────────────┐
+                    │   Available     │
+                    │   (Open for     │
+                    │   Enrollment)   │
+                    └─────────┬───────┘
+                              │
+                              │ Student Enrolls
+                              │
+                    ┌─────────▼───────┐
+                    │   Enrolled      │
+                    │   (Student      │
+                    │   Successfully  │
+                    │   Enrolled)     │
+                    └─────────┬───────┘
+                              │
+                              │ Student Drops
+                              │
+                    ┌─────────▼───────┐
+                    │   Available     │
+                    │   (Open for     │
+                    │   Enrollment)   │
+                    └─────────┬───────┘
+                              │
+                              │ Course Reaches
+                              │ Capacity
+                              │
+                    ┌─────────▼───────┐
+                    │   Full          │
+                    │   (No More      │
+                    │   Seats)        │
+                    └─────────┬───────┘
+                              │
+                              │ Student Drops
+                              │ (Waitlist
+                              │  Promotion)
+                              │
+                    ┌─────────▼───────┐
+                    │   Available     │
+                    │   (Open for     │
+                    │   Enrollment)   │
+                    └─────────────────┘
+</code></pre>
+<h2 id="5-component-diagram-system-architecture">5. Component Diagram - System Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              PRESENTATION TIER                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Web Browser   │    │  Mobile App     │    │ Desktop App     │
+│                 │    │                 │    │                 │
+│  - HTML/CSS/JS  │    │  - React Native │    │  - Electron     │
+│  - React/Vue    │    │  - Flutter      │    │  - WPF          │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │      API Gateway        │
+                    │                         │
+                    │  - Authentication       │
+                    │  - Rate Limiting        │
+                    │  - Request Routing      │
+                    └────────────┬────────────┘
+                                 │
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                            BUSINESS LOGIC TIER                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Enrollment      │    │ Grade           │    │ User            │
+│ Service         │    │ Service         │    │ Service         │
+│                 │    │                 │    │                 │
+│ - Course        │    │ - Grade         │    │ - Authentication│
+│   Management    │    │   Submission    │    │ - Profile       │
+│ - Student       │    │ - Academic      │    │   Management   │
+│   Enrollment    │    │   Records       │    │ - Authorization │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │   Cross-Cutting         │
+                    │   Concerns              │
+                    │                         │
+                    │  - Logging              │
+                    │  - Caching              │
+                    │  - Security             │
+                    │  - Monitoring           │
+                    └────────────┬────────────┘
+                                 │
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                               DATA TIER                                         │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ User            │    │ Course          │    │ Enrollment      │
+│ Database        │    │ Database        │    │ Database        │
+│                 │    │                 │    │                 │
+│ - User Profiles │    │ - Course Info   │    │ - Enrollment    │
+│ - Authentication│    │ - Schedules     │    │   Records       │
+│ - Permissions   │    │ - Prerequisites │    │ - Waitlists     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │   Data Access Layer    │
+                    │                         │
+                    │  - ORM (SQLAlchemy)    │
+                    │  - Repository Pattern  │
+                    │  - Connection Pooling  │
+                    └─────────────────────────┘
+</code></pre>
+<h2 id="6-design-pattern-class-diagram">6. Design Pattern Class Diagram</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              OBSERVER PATTERN                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐                    ┌─────────────────┐
+│    Subject      │                    │    Observer     │
+│                 │                    │                 │
+│ + attach()      │                    │ + update()      │
+│ + detach()      │                    │                 │
+│ + notify()      │                    │                 │
+└─────────────────┘                    └─────────────────┘
+         ▲                                       ▲
+         │                                       │
+         │                                       │
+┌────────▼────────┐                    ┌────────▼────────┐
+│ EnrollmentService│                    │EmailNotification│
+│                 │                    │   Observer      │
+│                 │                    │                 │
+│                 │                    │ + update()      │
+└─────────────────┘                    └─────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              FACTORY PATTERN                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐                    ┌─────────────────┐
+│  UserFactory    │                    │      User       │
+│                 │                    │                 │
+│ + create_user() │                    │                 │
+└─────────────────┘                    └─────────────────┘
+         ▲                                       ▲
+         │                                       │
+         │                                       │
+┌────────▼────────┐                    ┌────────▼────────┐
+│ StudentFactory  │                    │    Student      │
+│                 │                    │                 │
+│ + create_user() │                    │                 │
+└─────────────────┘                    └─────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              STRATEGY PATTERN                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐                    ┌─────────────────┐
+│ValidationStrategy│                    │ValidationContext│
+│                 │                    │                 │
+│ + validate()    │                    │ - strategy      │
+└─────────────────┘                    │ + set_strategy()│
+         ▲                             │ + validate()    │
+         │                             └─────────────────┘
+         │
+┌────────▼────────┐
+│PrerequisiteValid│
+│   ationStrategy │
+│                 │
+│ + validate()    │
+└─────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              COMMAND PATTERN                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐                    ┌─────────────────┐
+│    Command      │                    │ CommandInvoker  │
+│                 │                    │                 │
+│ + execute()     │                    │ + execute_cmd() │
+│ + undo()        │                    │ + undo_last()   │
+└─────────────────┘                    └─────────────────┘
+         ▲                                       │
+         │                                       │
+         │                                       │
+┌────────▼────────┐                    ┌────────▼────────┐
+│EnrollStudentCmd │                    │                 │
+│                 │                    │                 │
+│ + execute()     │                    │                 │
+│ + undo()        │                    │                 │
+└─────────────────┘                    └─────────────────┘
+</code></pre>
+<p>These UML diagrams provide a comprehensive view of the NexusEnroll system architecture, showing the relationships between classes, the flow of operations, and the implementation of design patterns.</p>
+</body>
+</html>

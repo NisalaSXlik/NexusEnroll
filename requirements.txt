@@ -1,0 +1,6 @@
+# NexusEnroll University Course Enrollment System
+# Software Architecture Assignment - SCS 2303
+
+# Core dependencies
+# No external dependencies required for this implementation
+# All functionality implemented using Python standard library
