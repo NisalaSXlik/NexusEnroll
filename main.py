@@ -11,9 +11,35 @@
 # from report_template import ReportTemplate
 # from report_adapter import ReportAdapter
 
+# --- Assignment alignment notes ---
+# Architecture: 3-Tier Architecture (client/demo -> business/domain services -> data/integration stubs)
+# This script is a runnable business-tier proof-of-concept (no UI) to satisfy Part B.
+# Design patterns covered and where:
+# - Factory Method: core.catalogue.ConcreteCourseFactory
+# - Strategy: enrolment.validation_strategies.* used by EnrolmentService
+# - Command: enrolment operations and faculty grade submission (SubmitGradeCommand)
+# - Observer: schedule.ScheduleObserver; shared.notifications.* for system-wide notifications
+# - State: schedule.course_state.CourseContext; faculty.grades.Grade state
+# - Builder: admin.builder.* for program construction
+# - Template Method: admin.reports.EnrollmentReport
+# - Adapter: admin.adapters.CSVAdapter
+# - Facade + Iterator: faculty.roster.RosterFacade
+# - Chain of Responsibility + Decorator: faculty.course_requests pipeline + LoggingDecorator
+# - Singleton: admin.management.AdminManager
+# - Transaction: shared.transactions.EnrolmentTransaction
+# Core features covered:
+# - Student: catalogue browse, enrol/drop with validation, schedule, progress
+# - Faculty: roster viewing, grade submission with state
+# - Admin: program build, override enrolment, reports
+# System-wide: notifications, transactional enrolment
+
+
+# Helper to print section headers
 def print_header(title):
     print("\n" + "="*10 + f" {title} " + "="*10)
 
+
+# Simple Student entity for demo
 class Student:
     def __init__(self, name):
         self.name = name
@@ -24,352 +50,137 @@ class Student:
     def __str__(self):
         return f"Student({self.name})"
 
-# Inject fallback modules/classes so demo runs without external packages.
-# These are minimal, non-persistent stubs that satisfy the demo flow.
-import sys, types
-
-def _ensure_module(path: str):
-    parent = None
-    full = ""
-    for part in path.split("."):
-        full = part if not full else f"{full}.{part}"
-        if full not in sys.modules:
-            m = types.ModuleType(full)
-            sys.modules[full] = m
-            if parent:
-                setattr(parent, part, m)
-        parent = sys.modules[full]
-    return sys.modules[full]
-
-# core.catalogue
-_core_cat = _ensure_module("core.catalogue")
-class _Course:
-    def __init__(self, course_id, name, instructor, capacity=999, schedule_time=None, prerequisites=None, **kwargs):
-        self.course_id = course_id
-        self.name = name
-        self.instructor = instructor
-        self.capacity = capacity
-        self.schedule_time = schedule_time
-        self.prerequisites = prerequisites or []
-        self.enrolled_students = []
-    def __str__(self):
-        return f"Course({self.course_id} - {self.name})"
-    def enrol_student(self, student):
-        if student in self.enrolled_students:
-            return False
-        if len(self.enrolled_students) >= self.capacity:
-            return False
-        self.enrolled_students.append(student)
-        return True
-    def drop_student(self, student):
-        if student in self.enrolled_students:
-            self.enrolled_students.remove(student)
-            return True
-        return False
-
-class _LabCourse(_Course):
-    def __init__(self, lab_room=None, **kwargs):
-        super().__init__(**kwargs)
-        self.lab_room = lab_room
-
-class ConcreteCourseFactory:
-    def create_course(self, course_type, **kwargs):
-        if course_type == "Lab":
-            return _LabCourse(**kwargs)
-        return _Course(**kwargs)
-
-_core_cat.ConcreteCourseFactory = ConcreteCourseFactory
-
-# enrolment.validation_strategies
-_val = _ensure_module("enrolment.validation_strategies")
-class CapacityValidation:
-    def validate(self, student, course):
+def verify_required_modules():
+    import importlib
+    print_header("Assignment Self-Check (Module Readiness)")
+    modules = [
+        "core.catalogue",
+        "enrolment.validation_strategies",
+        "enrolment.enrolment_service",
+        "schedule.schedule",
+        "faculty.grades",
+        "admin.builder",
+        "admin.reports",
+        "admin.adapters",
+        "schedule.progress_tracker",
+        "schedule.course_state",
+        "faculty.roster",
+        "faculty.course_requests",
+        "admin.management",
+        "shared.notifications",
+        "shared.transactions",
+    ]
+    ok = True
+    for m in modules:
         try:
-            return len(course.enrolled_students) < course.capacity
-        except Exception:
-            return True
+            importlib.import_module(m)
+            print(f"[OK] {m}")
+        except Exception as e:
+            ok = False
+            print(f"[MISSING] {m} -> {e}")
+    if ok:
+        print("All referenced modules import successfully. Demo is ready for recording/reporting.")
+    else:
+        print("One or more modules missing. Complete/adjust imports before submission.")
 
-class PrerequisiteValidation:
-    def validate(self, student, course):
-        needed = getattr(course, "prerequisites", [])
-        completed_ids = {c.course_id if hasattr(c, "course_id") else c for c in getattr(student, "completed_courses", [])}
-        return all((p in completed_ids) for p in needed)
+if __name__ == "__main__":
+    # Streamlined PoC demo in assignment brief order
+    print_header("NexusEnroll Demo Start")
 
-class ScheduleConflictValidation:
-    def validate(self, student, course):
-        ct = getattr(course, "schedule_time", None)
-        if not ct:
-            return True
-        for c in getattr(student, "enrolled_courses", []):
-            if getattr(c, "schedule_time", None) == ct and c is not course:
-                return False
-        return True
+    # 1. Course creation and catalogue browsing
+    print_header("Course Creation and Catalogue Browsing")
+    from core.catalogue import ConcreteCourseFactory, CourseCatalogue
+    factory = ConcreteCourseFactory()
+    catalogue = CourseCatalogue()
+    cs101 = factory.create_course("Lecture", course_id="CS101", name="Intro to CS", instructor="Prof. Smith", capacity=2, prerequisites=[], schedule="Mon 9am")
+    cs102 = factory.create_course("Lab", course_id="CS102", name="Data Structures Lab", instructor="Prof. Lee", capacity=1, prerequisites=["CS101"], schedule="Wed 10am", lab_room="Lab1")
+    catalogue.add_course(cs101)
+    catalogue.add_course(cs102)
+    print("All courses:")
+    for c in catalogue.list_courses():
+        print(f"- {c}")
+    print("Search by instructor='Prof. Smith':")
+    for c in catalogue.search_courses(instructor="Prof. Smith"):
+        print(f"- {c}")
 
-_val.CapacityValidation = CapacityValidation
-_val.PrerequisiteValidation = PrerequisiteValidation
-_val.ScheduleConflictValidation = ScheduleConflictValidation
+    # 2. Student registration/enrolment, schedule, progress
+    print_header("Student Registration, Enrolment, Schedule, Progress")
+    from schedule.schedule import ScheduleObserver, Schedule
+    alice = Student("Alice")
+    bob = Student("Bob")
+    alice.schedule_observer = ScheduleObserver()
+    bob.schedule_observer = ScheduleObserver()
+    from enrolment.validation_strategies import PrerequisiteValidation, CapacityValidation, ScheduleConflictValidation
+    from enrolment.enrolment_service import EnrolmentService
+    strategies = [PrerequisiteValidation(), CapacityValidation(), ScheduleConflictValidation()]
+    enrol_service = EnrolmentService(strategies)
+    result = enrol_service.enrol(alice, cs101)
+    if result:
+        alice.enrolled_courses.append(cs101)
+        Schedule(alice).add_course(cs101)
+        print(f"{alice.name} enrolled in {cs101.name}")
+    else:
+        print(f"{alice.name} could not enrol in {cs101.name}")
+    result = enrol_service.enrol(bob, cs101)
+    if result:
+        bob.enrolled_courses.append(cs101)
+        Schedule(bob).add_course(cs101)
+        print(f"{bob.name} enrolled in {cs101.name}")
+    else:
+        print(f"{bob.name} could not enrol in {cs101.name}")
+    alice.completed_courses.append("CS101")
+    result = enrol_service.enrol(alice, cs102)
+    if result:
+        alice.enrolled_courses.append(cs102)
+        Schedule(alice).add_course(cs102)
+        print(f"{alice.name} enrolled in {cs102.name}")
+    else:
+        print(f"{alice.name} could not enrol in {cs102.name}")
+    from schedule.progress_tracker import ProgressTracker
+    tracker = ProgressTracker()
+    tracker.add_completed(cs101, "A")
+    print(f"Completed: {tracker.get_completed_courses()}")
 
-# enrolment.enrolment_service
-_svc = _ensure_module("enrolment.enrolment_service")
-class EnrolmentService:
-    def __init__(self, strategies=None):
-        self.strategies = strategies or []
-    def _valid(self, student, course):
-        for s in self.strategies:
-            if not s.validate(student, course):
-                return False
-        return True
-    def enrol(self, student, course):
-        # Only validate; caller handles list mutations.
-        if course in student.enrolled_courses:
-            return False
-        return self._valid(student, course)
-    def drop(self, student, course):
-        # Only check membership.
-        return course in student.enrolled_courses
+    # 3. Faculty roster viewing, grade submission
+    print_header("Faculty Roster Viewing and Grade Submission")
+    from faculty.roster import RosterFacade
+    RosterFacade(cs101).view_roster()
+    from faculty.grades import Grade, SubmitGradeCommand
+    grade1 = Grade(alice, cs101, "A")
+    grade2 = Grade(bob, cs101, "B")
+    cmd1 = SubmitGradeCommand(grade1)
+    cmd2 = SubmitGradeCommand(grade2)
+    cmd1.execute()
+    cmd2.execute()
 
-_svc.EnrolmentService = EnrolmentService
+    # 4. Admin program management, reporting, override
+    print_header("Admin Program Management, Reporting, Override")
+    from admin.builder import ConcreteProgramBuilder, ProgramDirector
+    builder = ConcreteProgramBuilder()
+    director = ProgramDirector(builder)
+    program = director.construct("BSc CS", [cs101], [cs102])
+    print(f"Program: {program.name}, Required: {program.required_courses}, Electives: {program.electives}")
+    from admin.reports import EnrollmentReport
+    from admin.adapters import CSVAdapter
+    report = EnrollmentReport().generate()
+    csv = CSVAdapter().convert(report)
+    print(f"CSV Report: {csv}")
+    from admin.management import AdminManager
+    admin_mgr = AdminManager()
+    override_result = admin_mgr.override_enrolment(enrol_service, alice, cs102)
+    print(f"Admin override enrolment result: {override_result}")
+    # Now that a program exists, show remaining courses for tracker
+    print(f"Remaining: {tracker.remaining_courses(program)}")
 
-# schedule.schedule
-_sched = _ensure_module("schedule.schedule")
-class ScheduleObserver:
-    def update(self, action, student, course):
-        print(f"[ScheduleObserver] {student.name} {action} {course.name}")
+    # 5. System-wide requirements (notifications, transaction)
+    print_header("System-wide Notifications and Transaction Management")
+    from shared.notifications import NotificationService, StudentNotifier
+    notif_service = NotificationService()
+    student_notifier = StudentNotifier()
+    notif_service.subscribe(student_notifier)
+    notif_service.notify("course_dropped", f"{alice.name} dropped {cs101.name}")
+    from shared.transactions import EnrolmentTransaction
+    tx = EnrolmentTransaction(enrol_service, alice, cs101)
+    tx.execute()
 
-_sched.ScheduleObserver = ScheduleObserver
-
-# faculty.grades
-_grades = _ensure_module("faculty.grades")
-class Grade:
-    def __init__(self, student, course, grade_value):
-        self.student = student
-        self.course = course
-        self.grade_value = grade_value
-        self.submitted = False
-
-class SubmitGradeCommand:
-    def __init__(self, grade):
-        self.grade = grade
-    def execute(self):
-        self.grade.submitted = True
-
-_grades.Grade = Grade
-_grades.SubmitGradeCommand = SubmitGradeCommand
-
-# admin.builder
-_builder = _ensure_module("admin.builder")
-class _Program:
-    def __init__(self, name, required_courses, electives):
-        self.name = name
-        self.required_courses = required_courses
-        self.electives = electives
-
-class ConcreteProgramBuilder:
-    def __init__(self):
-        self._name = None
-        self._required = []
-        self._electives = []
-    def set_name(self, name):
-        self._name = name
-        return self
-    def set_required(self, required):
-        self._required = required or []
-        return self
-    def set_electives(self, electives):
-        self._electives = electives or []
-        return self
-    def build(self):
-        return _Program(self._name, self._required, self._electives)
-
-class ProgramDirector:
-    def __init__(self, builder):
-        self.builder = builder
-    def construct(self, name, required, electives):
-        return self.builder.set_name(name).set_required(required).set_electives(electives).build()
-
-_builder.ConcreteProgramBuilder = ConcreteProgramBuilder
-_builder.ProgramDirector = ProgramDirector
-
-# admin.reports
-_reports = _ensure_module("admin.reports")
-class EnrollmentReport:
-    def generate(self):
-        # Minimal demo data
-        return [{"student": "Alice", "course": "Sample"}]
-
-_reports.EnrollmentReport = EnrollmentReport
-
-# admin.adapters
-_adapters = _ensure_module("admin.adapters")
-class CSVAdapter:
-    def convert(self, data):
-        if isinstance(data, list) and data and isinstance(data[0], dict):
-            headers = list(data[0].keys())
-            lines = [",".join(headers)]
-            for row in data:
-                lines.append(",".join(str(row.get(h, "")) for h in headers))
-            return "\n".join(lines)
-        return str(data)
-
-_adapters.CSVAdapter = CSVAdapter
-
-# schedule.progress_tracker
-_progress = _ensure_module("schedule.progress_tracker")
-class ProgressTracker:
-    def __init__(self):
-        self._completed = []  # list of (course, grade)
-    def add_completed(self, course, grade):
-        self._completed.append((course, grade))
-    def get_completed_courses(self):
-        return [(getattr(c, "name", str(c)), g) for c, g in self._completed]
-
-_progress.ProgressTracker = ProgressTracker
-
-# schedule.course_state
-_cstate = _ensure_module("schedule.course_state")
-class CourseContext:
-    def __init__(self):
-        self._state = "Planned"
-    def get_state_name(self):
-        return self._state
-    def start(self):
-        if self._state == "Planned":
-            self._state = "Ongoing"
-    def complete(self):
-        if self._state == "Ongoing":
-            self._state = "Completed"
-    def archive(self):
-        if self._state == "Completed":
-            self._state = "Archived"
-
-_cstate.CourseContext = CourseContext
-
-# faculty.roster
-_roster = _ensure_module("faculty.roster")
-class RosterFacade:
-    def __init__(self, course):
-        self.course = course
-    def view_roster(self):
-        names = [s.name for s in getattr(self.course, "enrolled_students", [])]
-        print(f"[Roster] {self.course.name}: {', '.join(names) if names else '(empty)'}")
-
-_roster.RosterFacade = RosterFacade
-
-# faculty.course_requests
-_creq = _ensure_module("faculty.course_requests")
-class Request:
-    def __init__(self, level, message, requester):
-        self.level = level
-        self.message = message
-        self.requester = requester
-
-class _Handler:
-    def __init__(self):
-        self._next = None
-    def set_next(self, nxt):
-        self._next = nxt
-        return nxt
-    def handle(self, req):
-        if self._next:
-            return self._next.handle(req)
-        return f"Unhandled: {req.message}"
-
-class InstructorHandler(_Handler):
-    def handle(self, req):
-        if req.level == "instructor":
-            return f"Instructor approved: {req.message}"
-        return super().handle(req)
-
-class DeptHeadHandler(_Handler):
-    def handle(self, req):
-        if req.level == "dept_head":
-            return f"DeptHead approved: {req.message}"
-        return super().handle(req)
-
-class AdminHandler(_Handler):
-    def handle(self, req):
-        if req.level == "admin":
-            return f"Admin approved: {req.message}"
-        return super().handle(req)
-
-class LoggingDecorator(_Handler):
-    def __init__(self, handler):
-        super().__init__()
-        self._handler = handler
-    def set_next(self, nxt):
-        wrapped = LoggingDecorator(nxt)
-        self._handler.set_next(wrapped)
-        return wrapped
-    def handle(self, req):
-        print(f"[Log] Enter {self._handler.__class__.__name__}")
-        res = self._handler.handle(req)
-        print(f"[Log] Exit {self._handler.__class__.__name__}: {res}")
-        return res
-
-_creq.Request = Request
-_creq.InstructorHandler = InstructorHandler
-_creq.DeptHeadHandler = DeptHeadHandler
-_creq.AdminHandler = AdminHandler
-_creq.LoggingDecorator = LoggingDecorator
-
-# admin.management
-_mgmt = _ensure_module("admin.management")
-class AdminManager:
-    def override_enrolment(self, service, student, course):
-        # Bypass strict validations by forcing enrol
-        if course not in student.enrolled_courses:
-            student.enrolled_courses.append(course)
-        course.enrol_student(student)
-        return True
-
-_mgmt.AdminManager = AdminManager
-
-# shared.notifications
-_notif = _ensure_module("shared.notifications")
-class NotificationService:
-    def __init__(self):
-        self._subs = []
-    def subscribe(self, obs):
-        self._subs.append(obs)
-    def unsubscribe(self, obs):
-        if obs in self._subs:
-            self._subs.remove(obs)
-    def notify(self, event, message):
-        for s in list(self._subs):
-            if hasattr(s, "update"):
-                s.update(event, message)
-
-class StudentNotifier:
-    def update(self, event, message):
-        print(f"[Notify:{event}] {message}")
-
-_notif.NotificationService = NotificationService
-_notif.StudentNotifier = StudentNotifier
-
-# shared.transactions
-_trx = _ensure_module("shared.transactions")
-class EnrolmentTransaction:
-    def __init__(self, service, student, course):
-        self.service = service
-        self.student = student
-        self.course = course
-        self._committed = False
-    def execute(self):
-        # Validate first
-        if self.course in self.student.enrolled_courses:
-            print("[Tx] Enrol failed (already enrolled). Rolling back.")
-            return False
-        ok = self.service.enrol(self.student, self.course)
-        if not ok:
-            print("[Tx] Enrol failed (validation). Rolling back.")
-            return False
-        # Commit
-        self.student.enrolled_courses.append(self.course)
-        self.course.enrol_student(self.student)
-        self._committed = True
-        print("[Tx] Enrol committed.")
-        return True
-
-_trx.EnrolmentTransaction = EnrolmentTransaction
-
-print_header("NexusEnroll Demo End")
+    print_header("NexusEnroll Demo End")

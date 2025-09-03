@@ -1,12 +1,22 @@
 class Course:
-    def __init__(self, course_id, name, instructor, capacity, prerequisites=None, schedule=None):
+    def __init__(self, course_id, name, instructor, capacity, prerequisites=None, schedule=None, department=None, description=None):
         self._id = course_id
         self._name = name
         self._instructor = instructor
         self._capacity = capacity
         self._prerequisites = prerequisites if prerequisites else []
         self._schedule = schedule
+        self._department = department
+        self._description = description
         self._enrolled_students = []
+        self.waitlist = []
+    @property
+    def department(self):
+        return self._department
+
+    @property
+    def description(self):
+        return self._description
 
     @property
     def id(self):

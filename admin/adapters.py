@@ -21,3 +21,7 @@ class PDFAdapter(ReportAdapter):
     def convert(self, report):
         # Placeholder for PDF conversion
         return f"PDF({str(report)})"
+
+class DefaultAdapter(ReportAdapter):
+    def convert(self, report):
+        return f"Unsupported format for report: {report}"
