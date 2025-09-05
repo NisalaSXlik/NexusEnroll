@@ -1,4 +1,355 @@
-# Architecture — NexusEnroll (accurate)
+# Architecture — NexusEnroll
+
+## Executive Summary
+
+NexusEnroll implements a Service-Oriented Architecture (SOA) for university course enrollment management. The system demonstrates separation of concerns through distinct service layers (Student, Faculty, Admin) with shared core utilities and comprehensive design pattern implementation.
+
+---
+
+## High-Level Architecture Overview
+
+### System-Wide SOA Layout
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        NexusEnroll System                       │
+├─────────────────────────────────────────────────────────────────┤
+│                     Presentation Layer                         │
+│                      (main.py - Demo)                          │
+├─────────────────┬─────────────────┬─────────────────────────────┤
+│   Student       │    Faculty      │        Admin                │
+│   Service       │    Service      │        Service              │
+├─────────────────┼─────────────────┼─────────────────────────────┤
+│ • Enrolment     │ • Roster Mgmt   │ • Course Management         │
+│ • Schedule      │ • Grade Submit  │ • Program Building          │
+│ • Progress      │ • Course Req    │ • Override Authority        │
+│   Tracking      │   Workflow      │ • Reporting & Analytics     │
+└─────────────────┴─────────────────┴─────────────────────────────┘
+        │                │                      │
+        └────────────────┼──────────────────────┘
+                         │
+┌─────────────────────────────────────────────────────────────────┐
+│                    Core Domain Layer                            │
+├─────────────────────────────────────────────────────────────────┤
+│  Course Catalogue  │  Validation Engine  │  Business Rules      │
+│  • Course Factory  │  • Strategy Pattern │  • Domain Logic     │
+│  • Course Types    │  • Validation Chain │  • Entity Models    │
+└─────────────────────────────────────────────────────────────────┘
+                         │
+┌─────────────────────────────────────────────────────────────────┐
+│                  Shared Utilities & Patterns                   │
+├─────────────────────────────────────────────────────────────────┤
+│ Notifications   │ Transactions  │ Design Patterns Infrastructure│
+│ • Observer      │ • Rollback    │ • Command/Strategy/State     │
+│ • Multi-channel │ • ACID Ops    │ • Factory/Builder/Adapter    │
+└─────────────────────────────────────────────────────────────────┘
+                         │
+┌─────────────────────────────────────────────────────────────────┐
+│                    Integration Layer                            │
+│              (Future: DB, External APIs, Mobile)               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Communication Paths
+
+**Service-to-Service Communication:**
+- **Admin → Faculty/Student**: Program updates, enrollment overrides
+- **Faculty → Student**: Grade notifications, course availability
+- **Student → Faculty**: Enrollment requests, progress updates
+
+**Core Domain Access:**
+- All services access Course Catalogue for course information
+- Validation Engine used by Student service for enrollment checks
+- Business Rules enforced across all service operations
+
+**Shared Utilities:**
+- Notification system broadcasts events to all interested services
+- Transaction system ensures data consistency across service boundaries
+- Pattern infrastructure provides reusable components
+
+---
+
+## Architectural Justification
+
+### SOA vs. Microservices vs. 3-Tier Analysis
+
+| Aspect | 3-Tier | SOA (Current) | Microservices |
+|--------|--------|---------------|---------------|
+| **Deployment** | Monolithic | Service-oriented modules | Independent services |
+| **Complexity** | Low | Medium | High |
+| **Scalability** | Limited | Good | Excellent |
+| **Maintenance** | Simple | Moderate | Complex |
+| **Team Size** | Small-Medium | Medium | Large |
+| **Network Overhead** | None | Low | High |
+
+**Why SOA for NexusEnroll:**
+
+1. **Right-sized Complexity**: University enrollment systems require structured service separation without microservices overhead
+2. **Shared Domain Logic**: Course catalogs, validation rules, and business logic benefit from centralized management
+3. **Deployment Simplicity**: Single deployment unit reduces operational complexity for educational institutions
+4. **Development Team Scale**: SOA aligns with typical university IT team sizes and skill sets
+5. **Data Consistency**: Academic data requires strong consistency, easier to achieve with SOA than distributed microservices
+
+**Trade-offs Considered:**
+- **vs 3-Tier**: Sacrificed simplicity for better separation of concerns and pattern demonstration
+- **vs Microservices**: Sacrificed independent scaling for reduced complexity and stronger consistency
+
+---
+
+## Maintainability & Scalability
+
+### Maintainability Strengths
+
+**Separation of Concerns:**
+- Clear service boundaries (Student/Faculty/Admin)
+- Domain logic isolated in core layer
+- Shared utilities prevent code duplication
+
+**Design Pattern Implementation:**
+- Command pattern enables undo/redo operations
+- Strategy pattern allows flexible validation rules
+- Observer pattern decouples notifications
+- Factory pattern simplifies course creation
+
+**Code Organization:**
+```
+├── admin/          # Administrative services
+├── faculty/        # Faculty-specific operations  
+├── core/           # Domain models and business logic
+├── enrolment/      # Student enrollment services
+├── schedule/       # Schedule and progress tracking
+└── shared/         # Cross-cutting concerns
+```
+
+### Scalability Considerations
+
+**Horizontal Scaling Potential:**
+- Service boundaries enable independent scaling
+- Stateless service design supports load distribution
+- Observer pattern allows asynchronous processing
+
+**Performance Optimization:**
+- Factory pattern reduces object creation overhead
+- Strategy pattern enables runtime optimization selection
+- Facade pattern simplifies complex subsystem interactions
+
+**Resource Management:**
+- Singleton pattern for system-wide resources (AdminManager)
+- Iterator pattern for memory-efficient data traversal
+- Transaction pattern for resource rollback
+
+---
+
+## Future Integration Possibilities
+
+### Mobile Application Integration
+
+**Architecture Extensions:**
+```
+Mobile App (iOS/Android)
+       ↓
+REST API Gateway
+       ↓
+NexusEnroll SOA Services
+```
+
+**Implementation Strategy:**
+- Add REST controllers to each service layer
+- Implement JWT authentication for mobile sessions
+- Extend notification system for push notifications
+- Adapt existing validation strategies for mobile workflows
+
+### Financial Aid System Integration
+
+**Integration Patterns:**
+```
+Financial Aid System ←→ Adapter Layer ←→ Admin Service
+                                      ↓
+                              Student Enrollment Validation
+```
+
+**Technical Approach:**
+- Extend existing Adapter pattern (admin/adapters.py)
+- Add financial aid validation strategy
+- Integrate with transaction system for payment processing
+- Leverage notification system for financial updates
+
+### External System Connectivity
+
+**Planned Integration Points:**
+1. **Student Information System (SIS)**: Data synchronization via existing adapters
+2. **Learning Management System (LMS)**: Course content delivery through facade pattern
+3. **Academic Analytics**: Extend reporting system with data warehouse connectors
+4. **Identity Management**: Integrate with university LDAP/SSO systems
+
+---
+
+## Principles & Patterns Analysis
+
+### SOLID Principles Implementation
+
+#### Single Responsibility Principle (SRP)
+**Examples in Codebase:**
+- `CourseCatalogue` (core/catalogue.py): Only manages course collection and search
+- `ValidationStrategy` (enrolment/validation_strategies.py): Each strategy handles one validation concern
+- `NotificationService` (shared/notifications.py): Only handles observer management and notification dispatch
+
+**Benefits:**
+- Each class has one reason to change
+- Easier unit testing and debugging
+- Clear ownership and maintenance boundaries
+
+#### Open/Closed Principle (OCP)
+**Examples in Codebase:**
+- `ValidationStrategy` hierarchy: New validation rules added without modifying existing code
+- `ReportGenerator` (admin/reports.py): New report types extend base class without changes
+- `CourseFactory`: New course types added via factory extension
+
+**Implementation:**
+```python
+# New validation strategy - extends without modification
+class FinancialAidValidation(ValidationStrategy):
+    def validate(self, student, course):
+        return student.has_financial_aid_approval()
+```
+
+### Additional Design Principles
+
+#### DRY (Don't Repeat Yourself)
+**Implementation:**
+- Shared utilities in `/shared` prevent code duplication
+- Template Method pattern in reports eliminates repeated report structure code
+- Base classes for common functionality (Command, ValidationStrategy, Observer)
+
+**Example:**
+```python
+# Base Command class eliminates repetition
+class Command(ABC):
+    @abstractmethod
+    def execute(self): pass
+    
+    @abstractmethod  
+    def undo(self): pass
+```
+
+#### KISS (Keep It Simple, Stupid)
+**Implementation:**
+- Facade pattern (RosterFacade) simplifies complex roster operations
+- Clear service boundaries reduce cognitive load
+- Single demonstration entry point (main.py) for system validation
+
+---
+
+## UML Activity Diagram: Course Browse/Search Flow
+
+```
+Student Perspective - Course Browse/Search Process
+
+    [Start]
+       │
+       ▼
+┌─────────────────┐
+│ Browse Courses  │ ◄─── Student
+└─────────────────┘
+       │
+       ▼
+┌─────────────────┐
+│ Access Course   │ ◄─── CourseCatalogue
+│   Catalogue     │
+└─────────────────┘
+       │
+       ▼
+    ◇ Apply Filters? ◇
+       │         │
+    [Yes]      [No]
+       │         │
+       ▼         ▼
+┌─────────────────┐    ┌─────────────────┐
+│ Filter Courses  │    │ Display All     │
+│ (Dept, Level,   │    │ Available       │
+│  Prerequisites) │    │ Courses         │
+└─────────────────┘    └─────────────────┘
+       │                       │
+       ▼                       │
+┌─────────────────┐             │
+│ Validate Search │ ◄─── Validator
+│ Criteria        │             │
+└─────────────────┘             │
+       │                       │
+       ▼                       │
+┌─────────────────┐             │
+│ Return Filtered │             │
+│ Course List     │             │
+└─────────────────┘             │
+       │                       │
+       └───────┬───────────────┘
+               ▼
+┌─────────────────┐
+│ Display Course  │
+│ Details         │
+│ • Name          │
+│ • Schedule      │
+│ • Prerequisites │
+│ • Capacity      │
+└─────────────────┘
+       │
+       ▼
+    ◇ Enroll Now? ◇
+       │         │
+    [Yes]      [No]
+       │         │
+       ▼         ▼
+┌─────────────────┐    ┌─────────────────┐
+│ Trigger         │    │ Continue        │
+│ Enrollment      │    │ Browsing        │ ───┐
+│ Validation      │    └─────────────────┘    │
+└─────────────────┘                           │
+       │                                      │
+       ▼                                      │
+┌─────────────────┐                           │
+│ Send            │ ◄─── Notifications       │
+│ Notifications   │                          │
+│ • Student Alert │                          │
+│ • Advisor Notice│                          │
+└─────────────────┘                          │
+       │                                     │
+       ▼                                     │
+    [End] ◄─────────────────────────────────┘
+
+Objects Involved:
+• Student: Initiates browse/search, makes enrollment decisions
+• CourseCatalogue: Provides course data and search functionality  
+• Validator: Ensures search criteria and enrollment eligibility
+• Notifications: Sends alerts about enrollment actions
+```
+
+### Activity Flow Explanation
+
+**Browse Phase:**
+1. Student accesses the course catalogue system
+2. System presents available courses or search interface
+3. Student can apply filters (department, level, prerequisites)
+
+**Filter & Validate Phase:**
+4. If filters applied, Validator checks search criteria validity
+5. CourseCatalogue returns filtered results based on criteria
+6. System displays course details including capacity and requirements
+
+**Display & Action Phase:**
+7. Student reviews course information
+8. Student decides whether to enroll or continue browsing
+9. If enrolling, system triggers validation and notification processes
+10. Notifications sent to relevant parties (student, advisor)
+
+**System Objects:**
+- **Student**: Primary actor driving the workflow
+- **CourseCatalogue**: Core service providing course data and search
+- **Validator**: Ensures business rule compliance
+- **Notifications**: Handles system-wide communication
+
+---
+
+## Implementation Status & File Mapping
 
 Purpose: provide a concise, repository-accurate description that maps implemented files to the assignment brief. This document only documents code that exists in the repo and its implemented/scaffolded status.
 
